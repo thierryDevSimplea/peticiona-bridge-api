@@ -10,6 +10,16 @@ python .\server.py
 
 A API ficará disponível em `http://127.0.0.1:8765`.
 
+## Demonstracao publica
+
+O painel pode ser acessado diretamente, sem instalar o projeto, em:
+
+<https://peticiona-bridge-api.vercel.app/dashboard>
+
+O codigo-fonte publico esta em:
+
+<https://github.com/thierryDevSimplea/peticiona-bridge-api>
+
 ## Painel de demonstracao
 
 Abra `http://127.0.0.1:8765/dashboard` para acessar o painel Simplea / Peticiona Bridge. Ele possui:
