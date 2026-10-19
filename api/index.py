@@ -1,2 +1,6 @@
-from server import ApiHandler as handler
+from server import ApiHandler
+
+
+class handler(ApiHandler):
+    pass
 
