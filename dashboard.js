@@ -21,10 +21,9 @@ function escapeHtml(value) {
 
 function dateDefaults() {
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+  const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const iso = (date) => date.toISOString().slice(0, 10);
-  $('#data-inicio').value = iso(yesterday);
+  $('#data-inicio').value = iso(firstOfMonth);
   $('#data-fim').value = iso(today);
 }
 
@@ -174,8 +173,18 @@ async function loadResults() {
       $('#datajud-processo').value = sample.numero_processo;
       $('#datajud-tribunal').value = sample.tribunal || 'TJSP';
     }
-    $('#results-notice').innerHTML = result.mock ? '<strong>Modo mock</strong><span>Esta resposta usa dados de teste. Remova o parametro modo=mock para consultar as fontes reais.</span>' : '<strong>Consulta concluida</strong><span>Os registros abaixo vieram das fontes indicadas na primeira coluna. A chave AASP continua pendente se ela nao estiver configurada.</span>';
-    $('#results-notice').className = `notice ${result.mock ? 'notice-blue' : 'notice-blue'}`;
+    const sourceErrors = (result.fontes || []).filter((source) => source.status !== 'ok');
+    if (result.mock) {
+      $('#results-notice').innerHTML = '<strong>Modo mock</strong><span>Esta resposta usa dados de teste. Remova o parametro modo=mock para consultar as fontes reais.</span>';
+      $('#results-notice').className = 'notice notice-blue';
+    } else if (sourceErrors.length) {
+      const details = sourceErrors.map((source) => `${source.fonte}: ${source.mensagem || statusLabel(source.status)}`).join(' | ');
+      $('#results-notice').innerHTML = `<strong>Consulta parcial</strong><span>Uma ou mais fontes nao responderam. ${escapeHtml(details)}. Os registros das fontes disponiveis continuam exibidos.</span>`;
+      $('#results-notice').className = 'notice notice-warning';
+    } else {
+      $('#results-notice').innerHTML = '<strong>Consulta concluida</strong><span>Os registros abaixo vieram das fontes indicadas na primeira coluna. A chave AASP continua pendente se ela nao estiver configurada.</span>';
+      $('#results-notice').className = 'notice notice-blue';
+    }
   } catch (error) {
     $('#results-notice').innerHTML = `<strong>Falha na consulta</strong><span>${escapeHtml(error.message)}</span>`;
     $('#results-notice').className = 'notice notice-danger';

@@ -115,9 +115,21 @@ def fetch_djen(oab: str, uf: str, data_inicio: str, data_fim: str) -> dict:
             with urllib.request.urlopen(request, timeout=20) as response:
                 payload = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
-            return {"fonte": "DJEN", "status": "erro_http", "http_status": exc.code, "items": []}
+            return {
+                "fonte": "DJEN",
+                "status": "erro_http",
+                "http_status": exc.code,
+                "mensagem": f"O servico respondeu HTTP {exc.code}; tente novamente com outro periodo.",
+                "items": [],
+            }
         except Exception as exc:
-            return {"fonte": "DJEN", "status": "indisponivel", "erro": type(exc).__name__, "items": []}
+            return {
+                "fonte": "DJEN",
+                "status": "indisponivel",
+                "erro": type(exc).__name__,
+                "mensagem": f"Nao foi possivel consultar o servico ({type(exc).__name__}).",
+                "items": [],
+            }
 
         total = payload.get("count", 0)
         for item in payload.get("items", []):

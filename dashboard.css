@@ -51,6 +51,7 @@ h2 { font-size: 18px; margin-bottom: 6px; color: var(--navy); }
 .button-secondary { color: var(--navy); background: var(--surface); }
 .button-secondary:hover { border-color: var(--cyan); color: #067e8b; }
 .notice { display: flex; align-items: flex-start; gap: 14px; border-left: 4px solid var(--cyan); padding: 14px 17px; background: var(--cyan-soft); margin-bottom: 20px; line-height: 1.45; }
+.notice-warning { border-left-color: #c88418; background: #fff7e8; }
 .notice strong { color: var(--navy); min-width: 200px; }
 .notice span { color: #4b6675; }
 .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-bottom: 30px; }
