@@ -1,0 +1,44 @@
+[
+  {
+    "id": "pub-0001",
+    "oab": "196088/SP",
+    "numero_processo": "1001234-56.2026.8.26.0506",
+    "tribunal": "TJSP",
+    "fonte": "DJEN",
+    "data_publicacao": "2026-10-19",
+    "partes": ["Empresa Alfa Ltda.", "Banco Exemplo S.A."],
+    "tipo": "Intimacao",
+    "texto": "Fica a parte intimada para apresentar manifestacao no prazo legal.",
+    "prazo_dias": 5,
+    "acao_sugerida": "Analisar publicacao e verificar necessidade de manifestacao",
+    "status": "pendente_analise"
+  },
+  {
+    "id": "pub-0002",
+    "oab": "196088/SP",
+    "numero_processo": "5009876-11.2026.4.03.6100",
+    "tribunal": "TRF3",
+    "fonte": "DataJud",
+    "data_publicacao": "2026-10-19",
+    "partes": ["Cliente Beta", "INSS"],
+    "tipo": "Movimentacao",
+    "texto": "Juntada de peticao e abertura de prazo para a parte autora.",
+    "prazo_dias": 10,
+    "acao_sugerida": "Conferir documentos e calcular prazo processual",
+    "status": "pendente_analise"
+  },
+  {
+    "id": "pub-0003",
+    "oab": "196088/SP",
+    "numero_processo": "0004567-88.2026.5.15.0004",
+    "tribunal": "TRT15",
+    "fonte": "DEJT",
+    "data_publicacao": "2026-10-18",
+    "partes": ["Cliente Gamma", "Industria Delta Ltda."],
+    "tipo": "Despacho",
+    "texto": "Designada audiencia e determinada a ciencia das partes.",
+    "prazo_dias": 0,
+    "acao_sugerida": "Registrar audiencia e verificar providencias",
+    "status": "em_revisao"
+  }
+]

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simplea | Peticiona Bridge</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img class="brand-logo" src="https://eudoxtnzcyobqakucczw.supabase.co/storage/v1/object/public/arquivos/V7.png" alt="Simplea">
+        <div>
+          <span>Peticiona Bridge</span>
+        </div>
+      </div>
+      <div class="environment"><span class="dot"></span> Ambiente local</div>
+      <nav class="nav" aria-label="Navegacao principal">
+        <button class="nav-item active" data-view="config">
+          <span class="nav-icon">&#9881;</span> Configuracao
+        </button>
+        <button class="nav-item" data-view="results">
+          <span class="nav-icon">&#9776;</span> Resultados reais
+        </button>
+      </nav>
+      <div class="sidebar-note">
+        <strong>OAB de demonstracao</strong>
+        <span>196088 / SP</span>
+        <small>Conectores e dados identificados por fonte.</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section id="view-config" class="view active-view">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">INTEGRACAO DE PUBLICACOES</p>
+            <h1>Fontes e configuracao</h1>
+            <p class="subtitle">Central de controle para consultar publicacoes juridicas e alimentar o sistema do Peticiona.</p>
+          </div>
+          <div class="heading-actions">
+            <span id="config-status" class="status-badge status-neutral">Carregando</span>
+            <button id="open-results" class="button button-primary">Ver resultados <span>&rarr;</span></button>
+          </div>
+        </div>
+
+        <div class="notice notice-blue">
+          <strong>Como esta demonstracao funciona</strong>
+          <span>O DJEN ja consulta dados reais. A AASP esta preparada para integrar, mas depende da chave oficial. O DataJud ja consulta movimentacoes por processo. DEJT, INLABS e DEOAB permanecem documentados para validacao tecnica.</span>
+        </div>
+
+        <div class="metrics" id="config-metrics">
+          <div class="metric"><span>Fontes prioritarias</span><strong>5</strong><small>DJEN, DataJud, DEJT, INLABS e DEOAB</small></div>
+          <div class="metric"><span>Ativas na demonstracao</span><strong id="active-count">2</strong><small>DJEN + AASP (agregador)</small></div>
+          <div class="metric"><span>Dados reais</span><strong id="real-status">DJEN</strong><small>Consulta por OAB/UF e periodo</small></div>
+        </div>
+
+        <div class="section-title">
+          <div><h2>Fontes configuraveis</h2><p>Marque as fontes que devem participar das consultas. Os links abrem a documentacao oficial.</p></div>
+          <button id="probe-sources" class="button button-secondary">Testar disponibilidade</button>
+        </div>
+        <div class="source-grid" id="source-grid"></div>
+
+        <div class="config-layout">
+          <section class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">PARAMETROS DA CONSULTA</p><h2>Identificacao</h2></div><span class="tag">Obrigatorio</span></div>
+            <div class="form-grid">
+              <label>Numero da OAB<input id="oab" value="196088" inputmode="numeric"></label>
+              <label>UF<select id="uf"><option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option></select></label>
+              <label>Data inicial<input id="data-inicio" type="date"></label>
+              <label>Data final<input id="data-fim" type="date"></label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">AGREGADOR AASP</p><h2>Credencial do conector</h2></div><span id="aasp-credential-status" class="status-badge status-warning">Pendente</span></div>
+            <p class="panel-copy">A chave deve ser fornecida pela AASP. Ela sera usada somente na memoria desta execucao local e nunca sera exibida de volta pelo painel.</p>
+            <div class="form-grid aasp-fields">
+              <label class="wide">Chave AASP<input id="aasp-key" type="password" placeholder="Cole a chave oficial recebida da AASP"></label>
+              <label>Codigo do associado<input id="aasp-code" placeholder="Opcional"></label>
+            </div>
+            <a class="doc-link" href="https://intimacaoapi.aasp.org.br/docapi/index.html" target="_blank" rel="noreferrer">Abrir documentacao da API AASP <span>&nearr;</span></a>
+          </section>
+        </div>
+
+        <div class="form-actions">
+          <span id="save-message" class="inline-message"></span>
+          <button id="save-config" class="button button-primary">Salvar configuracao</button>
+        </div>
+      </section>
+
+      <section id="view-results" class="view">
+        <div class="page-heading">
+          <div><p class="eyebrow">LEITURA E ORIGEM DOS DADOS</p><h1>Consulta e achados</h1><p class="subtitle">Cada registro mostra a fonte que o entregou, para separar dado real, credencial pendente e etapa futura.</p></div>
+          <div class="heading-actions"><button id="back-config" class="button button-secondary">&larr; Configuracao</button><button id="run-query" class="button button-primary">Consultar agora</button></div>
+        </div>
+        <div id="results-notice" class="notice notice-blue"><strong>Pronto para consultar</strong><span>Use o periodo configurado para buscar publicacoes por OAB.</span></div>
+        <div class="metrics results-metrics">
+          <div class="metric"><span>Publicacoes encontradas</span><strong id="result-total">-</strong><small>Somente fontes com retorno</small></div>
+          <div class="metric"><span>Processos unicos</span><strong id="process-total">-</strong><small>Agrupados por numero do processo</small></div>
+          <div class="metric"><span>Fonte com retorno</span><strong id="result-source">-</strong><small>Origem do dado exibido abaixo</small></div>
+        </div>
+        <section class="panel source-status-panel">
+          <div class="panel-heading"><div><p class="eyebrow">TRANSPARENCIA DA INTEGRACAO</p><h2>Status por fonte</h2></div><span class="muted">5 fontes prioritarias + AASP</span></div>
+          <div id="source-findings" class="source-findings"></div>
+        </section>
+        <section class="panel datajud-panel">
+          <div class="panel-heading"><div><p class="eyebrow">CONSULTA COMPLEMENTAR</p><h2>Movimentacoes no DataJud</h2></div><span class="status-badge status-info">Dados processuais</span></div>
+          <div class="datajud-intro">
+            <p>O DJEN informa publicacoes e intimacoes. O DataJud complementa a visao com a capa do processo e o historico de movimentacoes disponibilizado pelo CNJ.</p>
+            <a class="doc-link" href="https://datajud-wiki.cnj.jus.br/api-publica/" target="_blank" rel="noreferrer">Ver documentacao oficial do DataJud <span>&nearr;</span></a>
+          </div>
+          <div class="datajud-controls">
+            <label>Numero do processo<input id="datajud-processo" value="00218103120248260506" inputmode="numeric"></label>
+            <label>Tribunal<input id="datajud-tribunal" value="TJSP" placeholder="Ex.: TJSP ou TRT15"></label>
+            <button id="datajud-query" class="button button-primary">Consultar movimentacoes</button>
+          </div>
+          <div id="datajud-result" class="datajud-result"><span class="muted">Escolha um processo e consulte a fonte complementar.</span></div>
+          <div class="table-wrap datajud-table-wrap"><table><thead><tr><th>Data</th><th>Movimentacao</th><th>Orgao julgador</th></tr></thead><tbody id="movements-body"><tr><td colspan="3" class="empty-state">Nenhuma movimentacao consultada.</td></tr></tbody></table></div>
+        </section>
+        <section class="panel table-panel">
+          <div class="panel-heading"><div><p class="eyebrow">DADOS RETORNADOS</p><h2>Publicacoes encontradas</h2></div><span id="query-period" class="muted"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Fonte</th><th>Tribunal / orgao</th><th>Processo</th><th>Data</th><th>Tipo</th><th>Conteudo</th></tr></thead><tbody id="results-body"><tr><td colspan="6" class="empty-state">Nenhuma consulta executada.</td></tr></tbody></table></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <script src="/dashboard.js"></script>
+</body>
+</html>

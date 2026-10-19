@@ -1,0 +1,69 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Peticiona Test API",
+    "version": "0.1.0",
+    "description": "API local de teste com dados ficticios para a OAB/SP 196088."
+  },
+  "servers": [{"url": "http://127.0.0.1:8765"}],
+  "paths": {
+    "/health": {
+      "get": {"summary": "Verifica a saude da API", "responses": {"200": {"description": "API disponivel"}}}
+    },
+    "/v1/publicacoes": {
+      "get": {
+        "summary": "Lista publicacoes da OAB",
+        "parameters": [
+          {"name": "oab", "in": "query", "required": true, "schema": {"type": "string", "example": "196088"}},
+          {"name": "uf", "in": "query", "required": true, "schema": {"type": "string", "example": "SP"}},
+          {"name": "status", "in": "query", "schema": {"type": "string"}},
+          {"name": "modo", "in": "query", "schema": {"type": "string", "enum": ["real", "mock"], "default": "real"}},
+          {"name": "data_inicio", "in": "query", "schema": {"type": "string", "format": "date"}},
+          {"name": "data_fim", "in": "query", "schema": {"type": "string", "format": "date"}},
+          {"name": "incluir_aasp", "in": "query", "schema": {"type": "boolean", "default": true}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 20}},
+          {"name": "offset", "in": "query", "schema": {"type": "integer", "default": 0}}
+        ],
+        "responses": {"200": {"description": "Publicacoes retornadas"}, "400": {"description": "OAB invalida"}}
+      }
+    },
+    "/v1/publicacoes/{id}": {
+      "get": {
+        "summary": "Busca uma publicacao",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "responses": {"200": {"description": "Publicacao encontrada"}, "404": {"description": "Publicacao nao encontrada"}}
+      }
+    },
+    "/v1/processos": {
+      "get": {
+        "summary": "Agrupa publicacoes por processo",
+        "parameters": [
+          {"name": "oab", "in": "query", "required": true, "schema": {"type": "string", "example": "196088"}},
+          {"name": "uf", "in": "query", "required": true, "schema": {"type": "string", "example": "SP"}}
+          ,{"name": "modo", "in": "query", "schema": {"type": "string", "enum": ["real", "mock"], "default": "real"}},
+          {"name": "data_inicio", "in": "query", "schema": {"type": "string", "format": "date"}},
+          {"name": "data_fim", "in": "query", "schema": {"type": "string", "format": "date"}},
+          {"name": "incluir_aasp", "in": "query", "schema": {"type": "boolean", "default": true}}
+        ],
+        "responses": {"200": {"description": "Processos retornados"}}
+      }
+    },
+    "/v1/datajud": {
+      "get": {
+        "summary": "Consulta capa e movimentacoes de um processo no DataJud",
+        "parameters": [
+          {"name": "processo", "in": "query", "required": true, "schema": {"type": "string", "example": "00218103120248260506"}},
+          {"name": "tribunal", "in": "query", "required": true, "schema": {"type": "string", "example": "TJSP"}}
+        ],
+        "responses": {"200": {"description": "Resultado do DataJud"}, "400": {"description": "Parametros invalidos"}}
+      }
+    },
+    "/v1/fontes": {
+      "get": {
+        "summary": "Lista as cinco fontes configuradas",
+        "parameters": [{"name": "probe", "in": "query", "schema": {"type": "boolean", "default": false}}],
+        "responses": {"200": {"description": "Fontes e situacao da integracao"}}
+      }
+    }
+  }
+}
