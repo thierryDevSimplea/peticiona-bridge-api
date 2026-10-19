@@ -134,6 +134,39 @@ function renderDatajud(result) {
   $('#movements-body').innerHTML = movements.length ? movements.map((movement) => `<tr><td>${escapeHtml(movement.data || '-')}</td><td><strong>${escapeHtml(movement.nome || '-')}</strong></td><td>${escapeHtml(movement.orgao || '-')}</td></tr>`).join('') : '<tr><td colspan="3" class="empty-state">O processo foi localizado, mas nao possui movimentacoes retornadas.</td></tr>';
 }
 
+function normalizeDjenItem(item, oab, uf) {
+  const text = String(item.texto || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return {
+    id: `djen-${item.id}`,
+    oab: `${oab}/${uf}`,
+    numero_processo: item.numero_processo || item.numeroProcesso,
+    tribunal: item.siglaTribunal,
+    orgao: item.nomeOrgao,
+    fonte: 'DJEN',
+    data_publicacao: item.data_disponibilizacao || item.dataDisponibilizacao,
+    tipo: item.tipoComunicacao,
+    texto: text,
+    link: item.link,
+    hash: item.hash,
+    status: 'pendente_analise',
+  };
+}
+
+async function fetchDjenFromBrowser(oab, uf, inicio, fim) {
+  const items = [];
+  let total = 0;
+  for (let page = 1; page <= 10; page += 1) {
+    const params = new URLSearchParams({ numeroOab: oab, ufOab: uf, dataDisponibilizacaoInicio: inicio, dataDisponibilizacaoFim: fim, pagina: String(page), itensPorPagina: '100' });
+    const response = await fetch(`https://comunicaapi.pje.jus.br/api/v1/comunicacao?${params.toString()}`, { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`DJEN respondeu HTTP ${response.status}`);
+    const payload = await response.json();
+    total = payload.count || 0;
+    items.push(...(payload.items || []).map((item) => normalizeDjenItem(item, oab, uf)));
+    if ((payload.items || []).length < 100 || items.length >= total) break;
+  }
+  return { total, items };
+}
+
 async function loadDatajud() {
   const processo = encodeURIComponent($('#datajud-processo').value);
   const tribunal = encodeURIComponent($('#datajud-tribunal').value);
@@ -154,13 +187,26 @@ async function loadDatajud() {
 async function loadResults() {
   const oab = encodeURIComponent($('#oab').value || '196088');
   const uf = encodeURIComponent($('#uf').value || 'SP');
-  const inicio = encodeURIComponent($('#data-inicio').value);
-  const fim = encodeURIComponent($('#data-fim').value);
+  const inicioValue = $('#data-inicio').value;
+  const fimValue = $('#data-fim').value;
+  const inicio = encodeURIComponent(inicioValue);
+  const fim = encodeURIComponent(fimValue);
   $('#run-query').textContent = 'Consultando...';
   $('#results-notice').innerHTML = '<strong>Consultando fontes</strong><span>Aguarde enquanto o conector consulta o DJEN e verifica a AASP configurada.</span>';
   try {
     const query = `/v1/publicacoes?oab=${oab}&uf=${uf}&data_inicio=${inicio}&data_fim=${fim}`;
-    const [result, processes] = await Promise.all([api(query), api(`/v1/processos?oab=${oab}&uf=${uf}&data_inicio=${inicio}&data_fim=${fim}`)]);
+    let [result, processes] = await Promise.all([api(query), api(`/v1/processos?oab=${oab}&uf=${uf}&data_inicio=${inicio}&data_fim=${fim}`)]);
+    const djen = (result.fontes || []).find((source) => source.fonte === 'DJEN');
+    if (djen && djen.status !== 'ok') {
+      try {
+        const browserResult = await fetchDjenFromBrowser(decodeURIComponent(oab), decodeURIComponent(uf), inicioValue, fimValue);
+        const processNumbers = new Set(browserResult.items.map((item) => item.numero_processo).filter(Boolean));
+        result = { ...result, total: browserResult.items.length, items: browserResult.items, fontes: result.fontes.map((source) => source.fonte === 'DJEN' ? { ...source, status: 'ok', total: browserResult.total, observacao: 'Consulta realizada diretamente pelo navegador.' } : source) };
+        processes = { ...processes, total: processNumbers.size };
+      } catch (browserError) {
+        console.warn('Consulta direta ao DJEN indisponivel:', browserError.message);
+      }
+    }
     $('#result-total').textContent = result.total;
     $('#process-total').textContent = processes.total;
     const working = (result.fontes || []).filter((source) => source.status === 'ok');
