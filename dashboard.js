@@ -7,9 +7,10 @@ const sourceDefinitions = [
   { id: 'aasp', name: 'AASP', type: 'Agregador recomendado', description: 'API de intimacoes para integrar publicacoes diretamente ao sistema do Peticiona.', docs: 'https://intimacaoapi.aasp.org.br/docapi/index.html', real: false },
 ];
 
+const API_BASE = window.API_BASE || (window.location.hostname.endsWith('github.io') ? 'https://peticiona-bridge-api.vercel.app' : '');
 const $ = (selector) => document.querySelector(selector);
 const api = async (url, options = {}) => {
-  const response = await fetch(url, options);
+  const response = await fetch(`${API_BASE}${url}`, options);
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || data.error || `HTTP ${response.status}`);
   return data;
