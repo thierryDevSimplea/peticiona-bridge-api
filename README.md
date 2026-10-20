@@ -12,7 +12,11 @@ A API ficará disponível em `http://127.0.0.1:8765`.
 
 ## Demonstracao publica
 
-O painel pode ser acessado diretamente, sem instalar o projeto, em:
+Entrada publica pelo GitHub Pages:
+
+<https://thierrydevsimplea.github.io/peticiona-bridge-api/>
+
+O link acima encaminha para o ambiente operacional completo, sem instalar o projeto:
 
 <https://peticiona-bridge-api.vercel.app/dashboard>
 
