@@ -109,7 +109,12 @@ def fetch_djen(oab: str, uf: str, data_inicio: str, data_fim: str) -> dict:
         })
         request = urllib.request.Request(
             f"{base}?{query}",
-            headers={"Accept": "application/json", "User-Agent": "PeticionaTestAPI/0.1"},
+            headers={
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0 (compatible; PeticionaBridge/1.0)",
+                "Origin": "https://peticiona-bridge-api.vercel.app",
+                "Referer": "https://peticiona-bridge-api.vercel.app/dashboard",
+            },
         )
         try:
             with urllib.request.urlopen(request, timeout=20) as response:
